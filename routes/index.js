@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var crypto = require('crypto');
 var User = require('../models/user');
+var Article = require('../models/article');
 
 function checkLogin(req, res, next) {
   if (!req.session.user) {
@@ -22,12 +23,18 @@ function checkNotLogin(req, res, next) {
 /* GET home page. */
 module.exports = function(app) {
   app.get('/', function(req, res, next) {
-    res.render('index', {
-      title: '主页',
-      user: req.session.user,
-      success: req.flash('success').toString(),
-      error: req.flash('error').toString()
-     });
+    Article.get(null, function (err, articles) {
+      if (err) {
+        articles = [];
+      }
+      res.render('index', {
+        title: '主页',
+        user: req.session.user,
+        articles: articles,
+        success: req.flash('success').toString(),
+        error: req.flash('error').toString()
+      });
+    });
   });
 
   app.get('/register', checkNotLogin);
@@ -106,12 +113,27 @@ module.exports = function(app) {
     });
   });
 
-  app.get('/new', checkLogin);
-  app.get('/new', function(req, res, next) {
-    res.render('new', { title: '新文章' });
+  app.get('/article', checkLogin);
+  app.get('/article', function(req, res, next) {
+    res.render('article', {
+      title: '新文章',
+      user: req.session.user,
+      success: req.flash('success').toString(),
+      error: req.flash('error').toString()
+     });
   });
-  app.post('/new', checkLogin);
-  app.post('/new', function(req, res, next) {
+  app.post('/article', checkLogin);
+  app.post('/article', function(req, res, next) {
+    var currentUser = req.session.user;
+    var article = new Article(currentUser.name, req.body.title, req.body.article);
+    article.save(function (err) {
+      if (err) {
+        req.flash('error', err);
+        return res.redirect('/');
+      }
+      req.flash('success', '发布成功!');
+      res.redirect('/');
+    });
   });
 
   app.get('/logout', checkLogin);

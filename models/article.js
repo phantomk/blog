@@ -1,4 +1,5 @@
 var mongodb = require('./db');
+var Markdown = require('markdown').markdown;
 
 function Article(name, title, article) {
   this.name = name;
@@ -68,6 +69,9 @@ Article.get = function(name, callback) {
         if (err) {
           return callback(err);
         }
+        docs.forEach(function (doc) {
+          doc.article = Markdown.toHTML(doc.article);
+        });
         callback(null, docs);
       });
     });

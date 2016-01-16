@@ -10,6 +10,7 @@ var index = require('./routes/index');
 var settings = require('./settings');
 var users = require('./routes/users');
 var flash = require('connect-flash');
+var multer  = require('multer');
 
 
 var app = express();
@@ -77,6 +78,13 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
+
+app.use(multer({
+  dest: './public/images',
+  rename: function (fieldname, filename) {
+    return filename;
+  }
+}));
 
 
 

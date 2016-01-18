@@ -24,7 +24,8 @@ Article.prototype.save = function(callback) {
       name: this.name,
       time: time,
       title: this.title,
-      article: this.article
+      article: this.article,
+      comments: []
   };
   mongodb.open(function (err, db) {
     if (err) {
@@ -70,7 +71,12 @@ Article.get = function(name, callback) {
           return callback(err);
         }
         docs.forEach(function (doc) {
-          doc.article = Markdown.toHTML(doc.article);
+          if (doc) {
+            doc.article = Markdown.toHTML(doc.article);
+            doc.comments.forEach(function (comment) {
+              comment.content = Markdown.toHTML(comment.content);
+            });
+          }
         });
         callback(null, docs);
       });

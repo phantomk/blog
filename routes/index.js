@@ -55,9 +55,9 @@ module.exports = function(app) {
     if (password !== password_confirm) {
       req.flash('error', '两次输入的密码不一致!');
       return res.redirect('/register');
-    };
+    }
     var md5 = crypto.createHash('md5');
-    var password = md5.update(req.body.password).digest('hex');
+    password = md5.update(req.body.password).digest('hex');
     var newUser = new User({
       name: name,
       password: password,

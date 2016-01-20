@@ -196,4 +196,8 @@ module.exports = function(app) {
       res.redirect('back');
     });
   });
+  
+  app.use(function (req, res) {
+    res.render("404");
+  });
 };

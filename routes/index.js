@@ -200,4 +200,13 @@ module.exports = function(app) {
   app.use(function (req, res) {
     res.render("404");
   });
+  
+  app.get('/links', function (req, res) {
+    res.render('links', {
+      title: '友情链接',
+      user: req.session.user,
+      success: req.flash('success').toString(),
+      error: req.flash('error').toString()
+    });
+  });
 };

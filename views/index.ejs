@@ -6,5 +6,6 @@
     日期：<%= article.time.minute %>
   </p>
   <p><%- article.article %></p>
+  <p class="info">阅读：<%= article.pv %> | 评论：<%= article.comments.length %></p>
 <% }) %>
 <%- include footer%>

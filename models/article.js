@@ -25,7 +25,8 @@ Article.prototype.save = function(callback) {
       time: time,
       title: this.title,
       article: this.article,
-      comments: []
+      comments: [],
+      pv: 0
   };
   mongodb.open(function (err, db) {
     if (err) {
@@ -106,6 +107,50 @@ Article.getArchive = function(callback) {
           return callback(err);
         }
         callback(null, docs);
+      });
+    });
+  });
+};
+
+
+Article.getOne = function(name, day, title, callback) {
+  mongodb.open(function (err, db) {
+    if (err) {
+      return callback(err);
+    }
+    db.collection('articles', function (err, collection) {
+      if (err) {
+        mongodb.close();
+        return callback(err);
+      }
+      collection.findOne({
+        "name": name,
+        "time.day": day,
+        "title": title
+      }, function (err, doc) {
+        if (err) {
+          mongodb.close();
+          return callback(err);
+        }
+        if (doc) {
+          collection.update({
+            "name": name,
+            "time.day": day,
+            "title": title
+          }, {
+            $inc: {"pv": 1}
+          }, function (err) {
+            mongodb.close();
+            if (err) {
+              return callback(err);
+            }
+          });
+          doc.article = Markdown.toHTML(doc.article);
+          doc.comments.forEach(function (comment) {
+            comment.content = Markdown.toHTML(comment.content);
+          });
+          callback(null, doc);
+        }
       });
     });
   });
